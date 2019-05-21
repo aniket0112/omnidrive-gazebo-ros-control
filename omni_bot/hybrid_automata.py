@@ -4,9 +4,10 @@ import numpy as np
 R = 0.05 #Radius of omnibot chassis
 
 KP = 5
+K = 1
 DISTANCE_TOL = 0.1 #meters
 HEADING_TOL = 0.1 #radians
-VELOCITY = 3 #m/s
+VELOCITY = 5 #m/s
 
 class Position():
     def __init__(self,x,y,yaw=0):
@@ -72,12 +73,31 @@ def findObstacleAngle(obstacle_sense):                                          
             obstaclePosition.x = obstaclePosition.x + w[0]
             obstaclePosition.y = obstaclePosition.y + w[1]
     return (min,np.arctan2(obstaclePosition.y,obstaclePosition.x))
-def followCurve(currPosition,y,FINAL_TIME,t,desiredHeading=0):
+
+def sigmoid(t):
+    return 1/(1+np.exp(-t))
+def followCurve(currPosition,endPosition,func,phi_arg,desiredHeading=0):
     robot = uniCycleState(0,0)
-    if t <= FINAL_TIME:
-        phi = np.arctan2(y,1)
-        distance = 10
-        error = angleBetweenTwoVector(currPosition.yaw,desiredHeading)
-        return threelWheelKinematics(distance,phi,error,currPosition.yaw)
+    distance = np.sqrt(np.square(endPosition.x-currPosition.x)
+                      +np.square(endPosition.y-currPosition.y))
+    if distance > DISTANCE_TOL:
+        v1 = sigmoid(distance)*VELOCITY
+        phi1 = phi_arg
     else:
-        return (robot,0,0,0)
+        v1 = 0
+        phi1 = 0
+
+    curve_error = func-currPosition.y
+    if abs(curve_error) > DISTANCE_TOL:
+        v2 = K*curve_error
+        phi2 = np.arctan2(curve_error,0)
+    else:
+        v2 = 0
+        phi2 = 0
+    heading_error = angleBetweenTwoVector(currPosition.yaw,desiredHeading)
+    print((v1,np.rad2deg(phi1),v2,np.rad2deg(phi2)))
+    distance = np.sqrt(np.square((v1*np.cos(phi1)+v2*np.cos(phi2)))
+                      +np.square((v1*np.sin(phi1)+v2*np.sin(phi2))))
+    phi = np.arctan2((v1*np.sin(phi1)+v2*np.sin(phi2)),
+                     (v1*np.cos(phi1)+v2*np.cos(phi2)))
+    return threelWheelKinematics(distance,phi,heading_error,currPosition.yaw)

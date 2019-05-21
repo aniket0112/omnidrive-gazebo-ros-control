@@ -21,7 +21,10 @@ desiredHeading = 0
 laser_data = HA.laserSensor([],[],0)
 
 def curve(t):																	# Derivate of curve to be followed w.r.t. time
-	y_derivative = np.cos(2*3.14*t/10)
+	y = np.sin(2*3.14*t/5)
+	return y
+def curve_derivative(t):
+	y_derivative = (2*3.14/5)*np.cos(2*3.14*t/5)
 	return y_derivative
 def readOdom(msg):																# Position and Heading Feedback
 	global currPosition
@@ -49,13 +52,11 @@ pub_l = rospy.Publisher(pub_topic_l,Float64,queue_size=10)						# Initialize lef
 pub_r = rospy.Publisher(pub_topic_r,Float64,queue_size=10)						# Initialize right wheel RPM publisher
 pub_f = rospy.Publisher(pub_topic_f,Float64,queue_size=10)						# Initialize front wheel RPM publisher
 r = rospy.Rate(FREQUENCY)
-t = 0																			# Intialize time at t=0
+endPosition = HA.Position(5,0)
 while not rospy.is_shutdown():
-	y = curve(t)
-	t = t + 1/float(FREQUENCY)
+	y = curve(currPosition.x)
 #	(robot,rpmLeft,rpmRight,rpmFront) = HA.GTG(currPosition,desiredPosition,desiredHeading)
-	(robot,rpmLeft,rpmRight,rpmFront) = HA.followCurve(currPosition,y,T_END,t)
-	print((t,y,currPosition.y))
+	(robot,rpmLeft,rpmRight,rpmFront) = HA.followCurve(currPosition,endPosition,y,np.arctan2(curve_derivative(currPosition.x),1))
 	pub_l.publish(rpmLeft)
 	pub_r.publish(rpmRight)
 	pub_f.publish(-rpmFront)	#minus sign because the wheel was joined in URDF design flipped from normal position
