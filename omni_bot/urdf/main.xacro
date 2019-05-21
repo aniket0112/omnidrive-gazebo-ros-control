@@ -1,0 +1,46 @@
+<?xml version='1.0'?>
+<robot name="omni_bot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:include filename="$(find omni_bot)/urdf/rim.xacro"/>
+  <xacro:include filename="$(find omni_bot)/urdf/plugins.gazebo"/>
+  <link name="base_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="1.57 0 0"/>
+      <mass value="0.10"/>
+      <inertia ixx="0.00092" ixy="0.0" ixz="0.0" iyy="0.00178" iyz="0.0" izz="0.00092"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="1.57 0 0"/>
+      <geometry>
+        <mesh filename="package://omni_bot/meshes/chassis.STL"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="1.57 0 0"/>
+      <geometry>
+        <mesh filename="package://omni_bot/meshes/chassis.STL"/>
+      </geometry>
+    </collision>
+  </link>
+  <xacro:rim name="left" parent="base_link" xyz="-0.1256 0.213875 0.025" rpy="1.57 1.57 0.5233" GAZEBO_color = "Gazebo/Red"/>
+  <xacro:rim name="right" parent="base_link" xyz="-0.1256 -0.213875 0.025" rpy="1.57 1.57 2.6167" GAZEBO_color = "Gazebo/Blue"/>
+  <xacro:rim name="front" parent="base_link" xyz="0.251 0 0.025" rpy="1.57 1.57 1.57" GAZEBO_color = "Gazebo/Green"/>
+
+<!-- Laser -->
+  <link name = "laser">
+    <visual>
+      <origin xyz="0 0 0.0" rpy="0 0 0" />
+      <geometry>
+          <cylinder length="0.1" radius="0.01" />
+      </geometry>
+      <material name="darkgray">
+        <color rgba=".2 .2 .2 1"/>
+      </material>
+    </visual>
+  </link>
+  <joint name="laser_joint" type="fixed">
+    <parent link = "base_link"/>
+    <child link = "laser"/>
+    <origin xyz="0 0 0.1" rpy="0 0 0"/>
+  </joint>
+
+</robot>

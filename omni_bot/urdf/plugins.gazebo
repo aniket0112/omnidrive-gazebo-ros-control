@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<robot>
+  <gazebo reference="base_link">
+    <material>Gazebo/Orange</material>
+  </gazebo>
+ <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotNamespace>/omni_bot</robotNamespace>
+      <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+    </plugin>
+ </gazebo>
+  <gazebo reference="laser">
+    <sensor type="ray" name="laser sensor">
+      <pose> 0 0 0 0 0 0 </pose>
+      <visualize>false</visualize>
+      <update_rate>40</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>720</samples>
+            <resolution>1</resolution>
+            <min_angle>-3.13</min_angle>
+            <max_angle>3.14</max_angle>
+          </horizontal>
+	</scan>
+	<range>
+  	  <min>0.05</min>
+	  <max>1.0</max>
+	  <resolution>0.01</resolution>
+	  </range>
+	<noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </ray>
+      <plugin name="gazebo_ros_laser_scan" filename="libgazebo_ros_laser.so">
+        <topicName>/omni_bot/laser/scan</topicName>
+        <frameName>laser</frameName>
+      </plugin>
+    </sensor>
+  </gazebo>
+</robot>

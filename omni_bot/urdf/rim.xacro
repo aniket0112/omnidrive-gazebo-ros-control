@@ -1,0 +1,60 @@
+<?xml version='1.0'?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+<xacro:include filename="$(find omni_bot)/urdf/roller.xacro"/>
+<xacro:macro name="rim" params="name parent xyz rpy GAZEBO_color">
+  <link name="rim_${name}_link">
+    <inertial>
+      <mass value="0.10"/>
+      <inertia ixx="7.6e-5" ixy="0.0" ixz="0.0" iyy="7.6e-5" iyz="0.0" izz="0.000125"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <cylinder radius="0.05" length="0.04"/>
+      </geometry>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder radius="0.05" length="0.04"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="${parent}_rim_${name}_joint" type="continuous">
+    <parent link="${parent}"/>
+    <child link="rim_${name}_link"/>
+    <axis xyz = "0 0 1"/>
+    <origin
+    xyz = "${xyz}"
+    rpy = "${rpy}"
+    />
+    <limit effort="1000" velocity="3140"/>
+  </joint>
+ <xacro:roller name="6" parent="${name}"  xyz="0.06 0 0.01" rpy="1.57 0 0"/>
+  <xacro:roller name="5" parent="${name}"  xyz="0.05196 0.03 -0.01" rpy="1.57 0 0.5233"/>
+  <xacro:roller name="4" parent="${name}"  xyz="0.03 0.05196 0.01" rpy="1.57 0 1.0466"/>
+  <xacro:roller name="3" parent="${name}"  xyz="0.0 0.06 -0.01" rpy="1.57 0 1.5699"/>
+  <xacro:roller name="2" parent="${name}"  xyz="-0.03 0.05196 0.01" rpy="1.57 0 2.0932"/>
+  <xacro:roller name="1" parent="${name}"  xyz="-0.05196 0.03 -0.01" rpy="1.57 0 2.6165"/>
+  <xacro:roller name="12" parent="${name}" xyz="-0.06 0.00 0.01" rpy="1.57 0 3.1398"/>
+  <xacro:roller name="11" parent="${name}" xyz="-0.05196 -0.03 -0.01" rpy="1.57 0 -2.6165"/>
+  <xacro:roller name="10" parent="${name}" xyz="-0.03 -0.05196 0.01" rpy="1.57 0 -2.0932"/>
+  <xacro:roller name="9" parent="${name}"  xyz="0.0 -0.06 -0.01" rpy="1.57 0 -1.5699"/>
+  <xacro:roller name="8" parent="${name}"  xyz="0.03 -0.05196 0.01" rpy="1.57 0 -1.0466"/>
+  <xacro:roller name="7" parent="${name}"  xyz="0.05196 -0.03 -0.01" rpy="1.57 0 -0.5233"/>
+
+  <transmission name="${name}_wheel_tran">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="${parent}_rim_${name}_joint">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="${name}_wheel_motor">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <gazebo reference="rim_${name}_link">
+    <material value= "${GAZEBO_color}"/>
+  </gazebo>
+
+</xacro:macro>
+</robot>

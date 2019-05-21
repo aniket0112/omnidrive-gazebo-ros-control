@@ -1,0 +1,13 @@
+<?xml version='1.0'?>
+<launch>
+  <include file="$(find gazebo_ros)/launch/empty_world.launch" />
+  <param name="robot_description" command="$(find xacro)/xacro.py $(find omni_bot)/urdf/main.xacro"/>
+  <node name="spawn_model" pkg="gazebo_ros" type="spawn_model"
+    args="-param robot_description -urdf -model wheel" output="screen"/>
+  <rosparam file="$(find omni_bot)/config/omni_bot.yaml" command="load"/>
+  <node name="control_spawn" pkg="controller_manager" type="spawner" respawn="false" ns="omni_bot"
+    output="screen" args="joint_state_controller left_wheel_controller right_wheel_controller front_wheel_controller"/>
+  <node name="robot_state_publisher" ns="omni_bot" pkg="robot_state_publisher" type="robot_state_publisher" respawn="false" output="screen">
+    <remap from="/joint_states" to="/omni_bot/joint_states"/>
+  </node>
+</launch>
